@@ -14,6 +14,10 @@ export class AuthService {
 
         const hash = await bcrypt.hash(registerUserDto.password, 10)
 
-        return this.userService.createUser({...registerUserDto, password: hash})
+        const createdUser = await this.userService.createUser({...registerUserDto, password: hash})
+
+        console.log(createdUser)
+
+        return createdUser
     }
 }

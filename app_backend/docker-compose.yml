@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+
+    container_name: lms-postgres
+
+    restart: always
+
+    ports:
+      - '5432:5432'
+
+    environment:
+      POSTGRES_USER: archit
+      POSTGRES_PASSWORD: strongpassword
+      POSTGRES_DB: lms_dev_db
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
