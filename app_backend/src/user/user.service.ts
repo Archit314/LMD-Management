@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { RegisterDto } from 'src/auth/dto/registerUser.dto';
+import { ErrorCodes } from 'src/common/constants/error-codes';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -9,13 +10,33 @@ export class UserService {
 
     async createUser(registerUserDto: RegisterDto){
 
-        // Storing user data in the database using Prisma ORM:
-        const user = await this.prisma.user.create({
-            firstName: registerUserDto.firstName,
-            lastName: registerUserDto.lastname,
-            email: registerUserDto.email,
-            password: registerUserDto.password
-        })
-        return {message: "User created successfully", data: user}
+        console.log(registerUserDto)
+
+        let result
+        try {
+            
+            // Storing user data in the database using Prisma ORM:
+            const user = await this.prisma.user.create({
+                data: {
+                    firstName: registerUserDto.firstName,
+                    lastName: registerUserDto.lastName,
+                    email: registerUserDto.email,
+                    password: registerUserDto.password,
+                },
+            })
+            result = user
+        } catch (error) {
+            console.log(error)
+
+            const err = error as { code?: string}
+
+            if(err && err.code === ErrorCodes.PRISMA_UNIQUE_CONSTRAINT.code){
+                throw new ConflictException(ErrorCodes.PRISMA_UNIQUE_CONSTRAINT.label)
+            }
+
+            throw err
+        }
+
+        return {message: "User created successfully", data: result}
     }
 }
