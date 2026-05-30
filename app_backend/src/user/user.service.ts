@@ -1,4 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common';
+import { LoginDto } from 'src/auth/dto/loginUser.dto';
 import { RegisterDto } from 'src/auth/dto/registerUser.dto';
 import { ErrorCodes } from 'src/common/constants/error-codes';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -38,5 +39,25 @@ export class UserService {
         }
 
         return {message: "User created successfully", data: result}
+    }
+
+    async findUser(loginUserDto: LoginDto){
+
+        try {
+            
+            const existUser = await this.prisma.user.findUnique({
+                where: {
+                    email: loginUserDto.email
+                }
+            })
+
+            if(existUser){
+                return existUser
+            }
+
+            return null
+        } catch (error) {
+            
+        }
     }
 }
