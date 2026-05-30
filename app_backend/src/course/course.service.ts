@@ -33,8 +33,11 @@ export class CourseService {
     return `This action returns all course`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
+  async findOne(id: number) {
+
+    return await this.prisma.course.findUnique({
+      where: {id}
+    })
   }
 
   update(id: number, updateCourseDto: UpdateCourseDto) {

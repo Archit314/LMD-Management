@@ -13,9 +13,9 @@ export class AuthService {
         private readonly jwtService: JwtService
     ){}
 
-    async generateToken(id: string, email: string){
+    async generateToken(id: string, email: string, role: string){
 
-        return await this.jwtService.signAsync({ sub: id, email: email})
+        return await this.jwtService.signAsync({ sub: id, email: email, role: role})
     }
 
     async registerUser(registerUserDto: RegisterDto){
@@ -26,7 +26,7 @@ export class AuthService {
 
         const createdUser = await this.userService.createUser({...registerUserDto, password: hash})
 
-        const token = await this.generateToken(createdUser.data.id, createdUser.data.email)
+        const token = await this.generateToken(createdUser.data.id, createdUser.data.email, createdUser.data.role)
 
         console.log(token)
 
@@ -43,7 +43,7 @@ export class AuthService {
             const isMatch = await bcrypt.compare(loginUserDto.password, gotUser.password)
             if(isMatch){
 
-                const token = await this.generateToken(String(gotUser.id), gotUser.email)
+                const token = await this.generateToken(String(gotUser.id), gotUser.email, gotUser.role)
                 return token
             }
         }

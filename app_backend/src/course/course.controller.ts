@@ -1,13 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { Role } from 'src/user/user.types';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('courses')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @Post()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   async create(@Body() createCourseDto: CreateCourseDto) {
     const createdCourse =  await this.courseService.create(createCourseDto);
     if(createdCourse){
@@ -22,8 +28,12 @@ export class CourseController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.courseService.findOne(+id);
+  async findOne(@Param('id') id: number) {
+    const gotCourse = await this.courseService.findOne(Number(id))
+    if(gotCourse){
+      return {message: "Course fetched successfully", data: gotCourse}
+    }
+    return {message: "Course not found"}
   }
 
   @Patch(':id')
