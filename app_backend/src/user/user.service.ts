@@ -41,21 +41,13 @@ export class UserService {
         return {message: "User created successfully", data: result}
     }
 
-    async findUser(loginUserDto: LoginDto){
+    async findUser({id, email}: {id?: number; email?: string}){
 
         try {
-            
-            const existUser = await this.prisma.user.findUnique({
-                where: {
-                    email: loginUserDto.email
-                }
+
+            return await this.prisma.user.findUnique({
+                where: id? {id}: {email},
             })
-
-            if(existUser){
-                return existUser
-            }
-
-            return null
         } catch (error) {
             
         }
